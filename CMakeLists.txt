@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16.0)
 
-set(le-cpp-utils_VERSION 0.1.2)
+set(le-cpp-utils_VERSION 0.1.3)
 
 project(le-cpp-utils VERSION ${le-cpp-utils_VERSION} LANGUAGES CXX)
 
@@ -70,7 +70,7 @@ configure_package_config_file(cmake/config.cmake.in
 write_basic_package_version_file(
 	${CMAKE_CURRENT_BINARY_DIR}/le-cpp-utils-config-version.cmake
 	VERSION ${le-cpp-utils_VERSION}
-	COMPATIBILITY SameMajorVersion
+	COMPATIBILITY ExactVersion
 )
 
 install(
