@@ -1,4 +1,5 @@
 #pragma once
+
 #include <spdlog/spdlog.h>
 
 #define LOG_DEBUG(msg, ...) spdlog::debug("{}: " msg, __FUNCTION__, ##__VA_ARGS__)

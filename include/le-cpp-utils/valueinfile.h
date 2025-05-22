@@ -1,7 +1,6 @@
 #pragma once
 
 #include <le-cpp-utils/logging.h>
-
 #include <fstream>
 #include <optional>
 #include <filesystem>
