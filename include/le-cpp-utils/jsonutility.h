@@ -1,6 +1,6 @@
 #pragma once
 
-#include <le-cpp-utils/timestring.h>
+#include <le-cpp-utils/time.h>
 #include <optional>
 #include <nlohmann/json.hpp>
 
@@ -12,7 +12,7 @@ namespace nlohmann
 	{
 		static void to_json(json& j, const std::chrono::system_clock::time_point& value)
 		{
-			j = le::timeString(std::chrono::system_clock::to_time_t(value));
+			j = le::timeIso8601Utc(value);
 		}
 	};
 

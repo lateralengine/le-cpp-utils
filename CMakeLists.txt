@@ -28,7 +28,6 @@ set(LE_CPP_UTILS_HEADERS
     include/le-cpp-utils/threadsafeevent.h
     include/le-cpp-utils/threadsafequeue.h
     include/le-cpp-utils/time.h
-    include/le-cpp-utils/timestring.h
     include/le-cpp-utils/valueinfile.h
     include/le-cpp-utils/versioncompare.h
     include/le-cpp-utils/winutils.h

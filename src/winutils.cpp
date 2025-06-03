@@ -1,6 +1,7 @@
+#ifdef _MSC_VER
+
 #include <le-cpp-utils/winutils.h>
 
-#ifdef _MSC_VER
 
 #pragma comment( lib, "Version" )
 

@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <thread>
+#include <condition_variable>
 
 using namespace le;
 
@@ -35,7 +36,7 @@ void MtAutoConfiguration::setCbStateChanged(std::function<void(bool)> cbStateCha
 {
 	PIMPL;
 	if (d->thread.joinable())
-		throw std::exception("MtAutoConfiguration already started");
+		throw std::runtime_error("MtAutoConfiguration already started");
 	m_cbStateChanged = cbStateChanged;
 }
 
@@ -43,7 +44,7 @@ void MtAutoConfiguration::setReconfigurationDelay(std::chrono::milliseconds reco
 {
 	PIMPL;
 	if (d->thread.joinable())
-		throw std::exception("MtAutoConfiguration already started");
+		throw std::runtime_error("MtAutoConfiguration already started");
 	m_reconfigurationDelay = reconfigurationDelay;
 }
 
@@ -51,7 +52,7 @@ void MtAutoConfiguration::setFnHeartbeat(std::function<bool(bool onConfigure)> f
 {
 	PIMPL;
 	if (d->thread.joinable())
-		throw std::exception("MtAutoConfiguration already started");
+		throw std::runtime_error("MtAutoConfiguration already started");
 	m_fnHeartbeat = fnHeartbeat;
 }
 
@@ -59,7 +60,7 @@ void MtAutoConfiguration::setHeartbeatTimeout(std::chrono::milliseconds heartbea
 {
 	PIMPL;
 	if (d->thread.joinable())
-		throw std::exception("MtAutoConfiguration already started");
+		throw std::runtime_error("MtAutoConfiguration already started");
 	m_heartbeatTimeout = heartbeatTimeout;
 }
 
@@ -67,7 +68,7 @@ void MtAutoConfiguration::start()
 {
 	PIMPL;
 	if (m_ok || d->thread.joinable())
-		throw std::exception("MtAutoConfiguration already started");
+		throw std::runtime_error("MtAutoConfiguration already started");
 
 	d->stopFlag = false;
 	d->thread = std::thread(&MtAutoConfiguration::autoConfigurationLoop, this);

@@ -4,7 +4,6 @@
 #include <functional>
 #include <chrono>
 #include <mutex>
-#include <optional>
 
 namespace le
 {
