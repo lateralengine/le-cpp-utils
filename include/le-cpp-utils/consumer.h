@@ -3,16 +3,32 @@
 #include <le-cpp-utils/logging.h>
 #include <le-cpp-utils/threadsafequeue.h>
 #include <memory>
+#include <stdexcept>
 
 namespace le
 {
+	// Primary template: for non-void types.
+	template<typename T>
+	struct CallbackFunction
+	{
+		using type = std::function<void(T)>;
+	};
+
+	// Specialization for void.
+	template<>
+	struct CallbackFunction<void>
+	{
+		using type = std::function<void()>;
+	};
 
 	template <typename Worker, typename DataIn, typename DataOut = void>
 	class Consumer
 	{
 
 	public:
-		explicit Consumer(std::unique_ptr<Worker> worker, std::function<void(DataOut)> cbDataOut = {}) : m_worker( std::move(worker) ), m_cbDataOut(cbDataOut) {}
+		using CallbackType = typename CallbackFunction<DataOut>::type;
+
+		explicit Consumer(std::unique_ptr<Worker> worker, CallbackType cbDataOut = {}) : m_worker( std::move(worker) ), m_cbDataOut(cbDataOut) {}
 		~Consumer() { stop(); }
 
 		void push(DataIn data)
@@ -26,6 +42,8 @@ namespace le
 
 		bool configure()
 		{
+			if (m_thread.joinable())
+				throw std::logic_error("Consumer must not be started before configuring worker!");
 			if (!m_worker->configure())
 				return false;
 			start();
@@ -108,7 +126,7 @@ namespace le
 		std::condition_variable m_cv;
 		bool m_stopFlag = false;
 		
-		std::function<void(DataOut)> m_cbDataOut;
+		CallbackType m_cbDataOut;
 
 	};
 }
