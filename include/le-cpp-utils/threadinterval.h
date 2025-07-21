@@ -5,8 +5,6 @@
 
 namespace le
 {
-
-    template<typename T>
     class ThreadInterval
     {
     public:
@@ -54,5 +52,4 @@ namespace le
         std::atomic<bool> running;
         std::thread thread;
     };
-
 } // namespace le
