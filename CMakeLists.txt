@@ -24,6 +24,7 @@ set(LE_CPP_UTILS_HEADERS
     include/le-cpp-utils/pimpl.h
     include/le-cpp-utils/speedmonitor.h
     include/le-cpp-utils/subcommand.h
+    include/le-cpp-utils/threadinterval.h
     include/le-cpp-utils/threadsafedata.h
     include/le-cpp-utils/threadsafeevent.h
     include/le-cpp-utils/threadsafequeue.h
