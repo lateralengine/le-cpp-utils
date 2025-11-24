@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16.0)
 
-set(le-cpp-utils_VERSION 0.1.4)
+set(le-cpp-utils_VERSION 0.1.5)
 
 project(le-cpp-utils VERSION ${le-cpp-utils_VERSION} LANGUAGES CXX)
 
@@ -23,6 +23,7 @@ set(LE_CPP_UTILS_HEADERS
     include/le-cpp-utils/persistentvalue.h
     include/le-cpp-utils/pimpl.h
     include/le-cpp-utils/speedmonitor.h
+    include/le-cpp-utils/signal.h
     include/le-cpp-utils/subcommand.h
     include/le-cpp-utils/threadinterval.h
     include/le-cpp-utils/threadsafedata.h
@@ -42,6 +43,7 @@ add_library(le-cpp-utils
     src/jsonutility.cpp
     src/mtautoconfiguration.cpp
     src/winutils.cpp
+    src/signal.cpp
 )
 
 target_compile_features(le-cpp-utils PRIVATE cxx_std_20)
