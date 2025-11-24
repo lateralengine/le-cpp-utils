@@ -45,6 +45,7 @@ add_library(le-cpp-utils
     src/winutils.cpp
     src/signal.cpp
 )
+add_library(le-cpp-utils::le-cpp-utils ALIAS le-cpp-utils)
 
 target_compile_features(le-cpp-utils PRIVATE cxx_std_20)
 
