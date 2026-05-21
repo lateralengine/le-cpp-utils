@@ -13,7 +13,7 @@ namespace le
         static_assert(std::is_copy_constructible<T>::value, "ThreadSafeData can only be used with copyable types.");
 
 	public:
-        ThreadSafeData() = default;
+        ThreadSafeData() : data{} {}
         ThreadSafeData(const ThreadSafeData<T>&) = delete;
         ThreadSafeData& operator=(const ThreadSafeData<T>&) = delete;
         ThreadSafeData(ThreadSafeData<T>&& other)

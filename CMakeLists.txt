@@ -1,11 +1,13 @@
-cmake_minimum_required(VERSION 3.16.0)
+cmake_minimum_required(VERSION 3.28.0 FATAL_ERROR)
 
-set(le-cpp-utils_VERSION 0.1.5)
+set(le-cpp-utils_VERSION 0.1.7)
 
 project(le-cpp-utils VERSION ${le-cpp-utils_VERSION} LANGUAGES CXX)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
+
+option(LE_CPP_UTILS_BUILD_TESTS "Build le-cpp-utils tests" ${PROJECT_IS_TOP_LEVEL})
 
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -20,6 +22,7 @@ set(LE_CPP_UTILS_HEADERS
     include/le-cpp-utils/logging.h
     include/le-cpp-utils/median.h
     include/le-cpp-utils/mtautoconfiguration.h
+    include/le-cpp-utils/pairhash.h
     include/le-cpp-utils/persistentvalue.h
     include/le-cpp-utils/pimpl.h
     include/le-cpp-utils/speedmonitor.h
@@ -40,14 +43,13 @@ set(LE_CPP_UTILS_HEADERS
 add_library(le-cpp-utils
     ${LE_CPP_UTILS_HEADERS}
     src/fileread.cpp
-    src/jsonutility.cpp
     src/mtautoconfiguration.cpp
     src/winutils.cpp
     src/signal.cpp
 )
 add_library(le-cpp-utils::le-cpp-utils ALIAS le-cpp-utils)
 
-target_compile_features(le-cpp-utils PRIVATE cxx_std_20)
+target_compile_features(le-cpp-utils PUBLIC cxx_std_20)
 
 target_include_directories(le-cpp-utils
 	PUBLIC
@@ -58,6 +60,11 @@ target_link_libraries(le-cpp-utils PUBLIC
     nlohmann_json::nlohmann_json
     spdlog::spdlog
 )
+
+if(LE_CPP_UTILS_BUILD_TESTS)
+    include(CTest)
+    add_subdirectory(tests)
+endif()
 
 configure_package_config_file(cmake/config.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/le-cpp-utils-config.cmake

@@ -522,5 +522,4 @@ MigrationBackup/
 
 # End of https://www.toptal.com/developers/gitignore/api/clion,cmake,visualstudio,visualstudiocode,c++
 
-CMakePresets.json
 CMakeUserPresets.json
