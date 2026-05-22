@@ -3,6 +3,7 @@
 #include <le-cpp-utils/logging.h>
 #include <le-cpp-utils/time.h>
 #include <optional>
+#include <functional>
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <fstream>
@@ -50,17 +51,75 @@ namespace nlohmann
 
 namespace le {
 
+inline std::optional<nlohmann::json> loadJsonFromFile(const std::string& path)
+{
+	if (!std::filesystem::exists(path))
+		return std::nullopt;
+
+	std::ifstream file(path);
+	if (!file.is_open())
+	{
+		LOG_ERROR("Failed to open JSON file ({}).", path);
+		return std::nullopt;
+	}
+
+	try
+	{
+		nlohmann::json j;
+		file >> j;
+		return j;
+	}
+	catch (...)
+	{
+		LOG_ERROR("Parsing JSON file ({}) failed.", path);
+	}
+	return std::nullopt;
+}
+
+inline bool saveJsonToFile(const std::string& path, const nlohmann::json& j, bool pretty = true)
+{
+	std::ofstream file(path, std::ios::out | std::ios::trunc);
+	if (!file.is_open())
+	{
+		LOG_ERROR("Failed to open JSON file for writing ({}).", path);
+		return false;
+	}
+	if (pretty)
+		file << std::setw(4) << j << std::endl;
+	else
+		file << j << std::endl;
+	return file.good();
+}
+
+inline std::optional<nlohmann::json> loadOrCreateJson(
+	const std::string& path,
+	std::function<nlohmann::json()> defaultJsonGenerator,
+	bool prettySave = true)
+{
+	if (std::filesystem::exists(path))
+	{
+		auto j = loadJsonFromFile(path);
+		if (j.has_value())
+			return j;
+	}
+	else
+	{
+		auto j = defaultJsonGenerator();
+		if (saveJsonToFile(path, j, prettySave))
+			return j;
+	}
+	return std::nullopt;
+}
+
 template<typename T>
 class JsonLoader
 {
 public:
 
-	/// @brief Load a JSON file into a C++ object.
-	/// @param createIfMissing If true, creates the file with default values if it doesn't exist. If false, returns false if the file is missing.
-	/// @return 
 	static bool load(const std::string& path, T& out, bool createIfMissing = true)
 	{
-		if (!std::filesystem::exists(path))
+		auto j = loadJsonFromFile(path);
+		if (!j)
 		{
 			if (!createIfMissing)
 			{
@@ -69,21 +128,11 @@ public:
 			}
 			LOG_WARN("JSON file ({}) not found. Creating with default values.", path);
 			out = T{};
-			return JsonLoader<T>::save(out, path);
+			return save(out, path);
 		}
-
-		std::ifstream file(path);
-		if (!file.is_open())
-		{
-			LOG_ERROR("Failed to open JSON file ({}).", path);
-			return false;
-		}
-
 		try
 		{
-			nlohmann::json j;
-			file >> j;
-			out = j.template get<T>();
+			out = j->template get<T>();
 			LOG_DEBUG("JSON file loaded ({}).", path);
 			return true;
 		}
@@ -101,18 +150,7 @@ public:
 
 	static bool save(const T& value, const std::string& path, bool prettyJson = true)
 	{
-		std::ofstream file(path, std::ios::out | std::ios::trunc);
-		if (!file.is_open())
-		{
-			LOG_ERROR("Failed to open JSON file ({}).", path);
-			return false;
-		}
-		nlohmann::json j = value;
-		if (prettyJson)
-			file << std::setw(4) << j;
-		else
-			file << j;
-		return file.good();
+		return saveJsonToFile(path, nlohmann::json(value), prettyJson);
 	}
 };
 

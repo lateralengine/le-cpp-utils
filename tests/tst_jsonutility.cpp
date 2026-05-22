@@ -2,6 +2,7 @@
 #include <le-cpp-utils/finally.h>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
+#include <string>
 
 struct TestConfig
 {
@@ -9,6 +10,60 @@ struct TestConfig
     std::string name = "default";
 };
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TestConfig, value, name)
+
+TEST_CASE("loadJsonFromFile / saveJsonToFile")
+{
+    auto tempPath = (std::filesystem::temp_directory_path() / "le_test_raw_json.tmp").string();
+    le::Finally cleanup([&] { std::filesystem::remove(tempPath); });
+
+    SECTION("save and load round-trip")
+    {
+        nlohmann::json original = {{"key", "value"}, {"num", 42}};
+        REQUIRE(le::saveJsonToFile(tempPath, original));
+
+        auto loaded = le::loadJsonFromFile(tempPath);
+        REQUIRE(loaded.has_value());
+        REQUIRE(loaded->at("key") == "value");
+        REQUIRE(loaded->at("num") == 42);
+    }
+
+    SECTION("load missing file returns nullopt")
+    {
+        auto result = le::loadJsonFromFile("nonexistent_le_test_raw.json");
+        REQUIRE_FALSE(result.has_value());
+    }
+}
+
+TEST_CASE("loadOrCreateJson")
+{
+    auto tempPath = (std::filesystem::temp_directory_path() / "le_test_create_json.tmp").string();
+    le::Finally cleanup([&] { std::filesystem::remove(tempPath); });
+
+    SECTION("creates file when missing")
+    {
+        auto result = le::loadOrCreateJson(tempPath, [] {
+            return nlohmann::json{{"created", true}};
+        });
+        REQUIRE(result.has_value());
+        REQUIRE(result->at("created") == true);
+        REQUIRE(std::filesystem::exists(tempPath));
+    }
+
+    SECTION("loads existing file without calling generator")
+    {
+        nlohmann::json existing = {{"existing", 99}};
+        REQUIRE(le::saveJsonToFile(tempPath, existing));
+
+        bool generatorCalled = false;
+        auto result = le::loadOrCreateJson(tempPath, [&] {
+            generatorCalled = true;
+            return nlohmann::json{};
+        });
+        REQUIRE(result.has_value());
+        REQUIRE(result->at("existing") == 99);
+        REQUIRE_FALSE(generatorCalled);
+    }
+}
 
 TEST_CASE("JsonLoader")
 {
